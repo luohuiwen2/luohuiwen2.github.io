@@ -1,0 +1,510 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="netapp  都是nfs协议 部署k8s-》迁移到k8s》弹性伸缩 redis持久化的东西redis跑在虚拟机上，重启了 快照，持久化到磁盘 aof， redis快照同时， rdb和aof都开aof文件优先，最全，首先aofaof对磁盘io有影响， 探针检测，导致重启》重启加载rdb快照内存数据丢了，会访问数据库 放的是session，丢了，登录状态会突然断开，验证码的会重新输redis重建，要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第5个文章">
+<meta property="og:url" content="http://example.com/2023/07/02/%E7%AC%AC5%E4%B8%AA%E6%96%87%E7%AB%A0%20-%20%E5%89%AF%E6%9C%AC/index.html">
+<meta property="og:site_name" content="luohuiwen">
+<meta property="og:description" content="netapp  都是nfs协议 部署k8s-》迁移到k8s》弹性伸缩 redis持久化的东西redis跑在虚拟机上，重启了 快照，持久化到磁盘 aof， redis快照同时， rdb和aof都开aof文件优先，最全，首先aofaof对磁盘io有影响， 探针检测，导致重启》重启加载rdb快照内存数据丢了，会访问数据库 放的是session，丢了，登录状态会突然断开，验证码的会重新输redis重建，要">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-07-02T23:27:58.000Z">
+<meta property="article:modified_time" content="2023-07-04T14:52:51.759Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="hello">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  <title>第5个文章 - luohuiwen</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="第5个文章">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2023-07-02 23:27" pubdate>
+        July 2, 2023 pm
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      7k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      59 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">第5个文章</h1>
+            
+            <div class="markdown-body">
+              <p>netapp  都是nfs协议</p>
+<p>部署k8s-》迁移到k8s》弹性伸缩</p>
+<p>redis持久化的东西<br>redis跑在虚拟机上，重启了</p>
+<p>快照，持久化到磁盘</p>
+<p>aof，</p>
+<p>redis快照<br>同时，</p>
+<p>rdb和aof都开<br>aof文件优先，最全，首先aof<br>aof对磁盘io有影响，</p>
+<p>探针检测，导致重启》重启加载rdb快照<br>内存数据丢了，会访问数据库</p>
+<p>放的是session，丢了，登录状态会突然断开，验证码的会重新输<br>redis重建，要</p>
+<p>在后台快照出现错误时，是停禁止写入数据。<br>stop-writes-on-bgsave-error no</p>
+<p>cd /data/dockerfile/web/magedu/redis</p>
+<p>chmod  +x *.sh </p>
+<p>%s/magedu/luohw/g</p>
+<p>harbor.luohw.net/luohw/redis:v4.4.14 </p>
+<p>测试镜像<br>nerdctl run  -it –rm -p 6379:6379 harbor.luohw.net/luohw/redis:v4.4.14 </p>
+<p>telnet  192.168.1.229 6379<br>info<br>auth 123456<br>info</p>
+<p>cd /data/yaml/magedu/redis</p>
+<p>创建pv<br>在存储创建目录<br>mkdir -p /data/k8sdata/magedu/redis-datadir-1 </p>
+<h2 id="cat-redis-persistentvolume-yaml"><a href="#cat-redis-persistentvolume-yaml" class="headerlink" title="cat redis-persistentvolume.yaml "></a>cat redis-persistentvolume.yaml </h2><p>apiVersion: v1<br>kind: PersistentVolume<br>metadata:<br>  name: redis-datadir-pv-1<br>spec:<br>  capacity:<br>    storage: 10Gi<br>  accessModes:<br>    - ReadWriteOnce<br>  nfs:<br>    path: /data/k8sdata/magedu/redis-datadir-1<br>    server: 192.168.1.221</p>
+<p>kubectl  apply  -f redis-persistentvolume.yaml<br>kubectl get pv<br>创建pvc<br>redis/pv# cat redis-persistentvolumeclaim.yaml </p>
+<hr>
+<p>apiVersion: v1<br>kind: PersistentVolumeClaim<br>metadata:<br>  name: redis-datadir-pvc-1<br>  namespace: magedu<br>spec:<br>  volumeName: redis-datadir-pv-1<br>  accessModes:<br>    - ReadWriteOnce<br>  resources:<br>    requests:<br>      storage: 10Gi<br>kubectl apply  -f  redis-persistentvolumeclaim.yaml<br>persistentvolumeclaim/redis-datadir-pvc-1 created<br>kubectl get pvc -n magedu</p>
+<p>部署<br>kubectl apply -f redis.yaml<br>测试容器<br>kubectl exec -it -n magedu  deploy-devops-redis-55bb67b448-4wrdk  bash</p>
+<p>redis-cli<br>auth 123456<br>info</p>
+<p>set test 1<br>get test </p>
+<p>写入数据<br>删除pod后，新创建的pod还有数据</p>
+<p>nginx是c写的<br>mysql是c++写的<br>编译都是c或c++</p>
+<p>redis cluster</p>
+<p>三主三重模式：</p>
+<p>appendonly yes<br>cluster-enabled yes  #开启集群<br>cluster-config-file /var/lib/redis/nodes.conf<br>cluster-node-timeout 5000  #一个node在多少时间内没有初始化成功会报错，5秒<br>dir /var/lib/redis  数据命令<br>port 6379</p>
+<p>nfs创建存储目录<br>mkdir -pv /data/k8sdata/magedu/{redis0,redis1,redis2,redis3,redis4,redis5}</p>
+<p>创建pv<br>cd /data/yaml/magedu/redis-cluster/pv<br>%s/172.31.7.109/192.168.1.221/g<br>kubectl apply -f redis-cluster-pv.yaml </p>
+<p>kubectl   get pv </p>
+<p>cat redis.conf<br>appendonly yes<br>cluster-enabled yes<br>cluster-config-file /var/lib/redis/nodes.conf<br>cluster-node-timeout 5000<br>dir /var/lib/redis<br>port 6379<br>使用configmap为redis  提供配置文件<br>kubectl create configmap  redis-conf  –from-file  redis.conf  -n magedu<br>创建名为redis-conf的configmap，configmap文件来自 当前目录redis.conf  ,创建在mageu命名空间<br>kubectl get configmaps  -n magedu </p>
+<ul>
+<li>containerPort: 6379 #客户端端口<div class="code-wrapper"><pre><code class="hljs">    name: redis
+    protocol: TCP
+  - containerPort: 16379#集群端口
+</code></pre></div>
+</li>
+</ul>
+<p>pvc名字  模板名字+statefulset控制器名字+id<br> data+redis+0<br>data+redis+1</p>
+<p>0-16383   16384个 逻辑上</p>
+<p>查看6个redis 正常<br>初始化redis<br>kubectl run -it ubuntu1804 –image=ubuntu:18.04 –restart=Never -n magedu bash<br>kubectl run -it ubuntu1804 –image=ubuntu:18.04 –restart=Never -n redis-cluster bash<br>更换清华源安装快<br>deb <a target="_blank" rel="noopener" href="http://mirrors.tuna.tsinghua.edu.cn/ubuntu/">http://mirrors.tuna.tsinghua.edu.cn/ubuntu/</a> bionic main restricted universe multiverse</p>
+<h1 id="deb-src-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-main-restricted-universe-multiverse"><a href="#deb-src-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-main-restricted-universe-multiverse" class="headerlink" title="deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse"></a>deb-src <a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu/">https://mirrors.tuna.tsinghua.edu.cn/ubuntu/</a> bionic main restricted universe multiverse</h1><p>deb <a target="_blank" rel="noopener" href="http://mirrors.tuna.tsinghua.edu.cn/ubuntu/">http://mirrors.tuna.tsinghua.edu.cn/ubuntu/</a> bionic-updates main restricted universe multiverse</p>
+<h1 id="deb-src-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-updates-main-restricted-universe-multiverse"><a href="#deb-src-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-updates-main-restricted-universe-multiverse" class="headerlink" title="deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse"></a>deb-src <a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu/">https://mirrors.tuna.tsinghua.edu.cn/ubuntu/</a> bionic-updates main restricted universe multiverse</h1><p>deb <a target="_blank" rel="noopener" href="http://mirrors.tuna.tsinghua.edu.cn/ubuntu/">http://mirrors.tuna.tsinghua.edu.cn/ubuntu/</a> bionic-backports main restricted universe multiverse</p>
+<h1 id="deb-src-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-backports-main-restricted-universe-multiverse"><a href="#deb-src-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-backports-main-restricted-universe-multiverse" class="headerlink" title="deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse"></a>deb-src <a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu/">https://mirrors.tuna.tsinghua.edu.cn/ubuntu/</a> bionic-backports main restricted universe multiverse</h1><p>deb <a target="_blank" rel="noopener" href="http://mirrors.tuna.tsinghua.edu.cn/ubuntu/">http://mirrors.tuna.tsinghua.edu.cn/ubuntu/</a> bionic-security main restricted universe multiverse</p>
+<h1 id="deb-src-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-security-main-restricted-universe-multiverse"><a href="#deb-src-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-security-main-restricted-universe-multiverse" class="headerlink" title="deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse"></a>deb-src <a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu/">https://mirrors.tuna.tsinghua.edu.cn/ubuntu/</a> bionic-security main restricted universe multiverse</h1><h1 id="deb-http-security-ubuntu-com-ubuntu-bionic-security-main-restricted-universe-multiverse"><a href="#deb-http-security-ubuntu-com-ubuntu-bionic-security-main-restricted-universe-multiverse" class="headerlink" title="deb http://security.ubuntu.com/ubuntu/ bionic-security main restricted universe multiverse"></a>deb <a target="_blank" rel="noopener" href="http://security.ubuntu.com/ubuntu/">http://security.ubuntu.com/ubuntu/</a> bionic-security main restricted universe multiverse</h1><h1 id="deb-src-http-security-ubuntu-com-ubuntu-bionic-security-main-restricted-universe-multiverse"><a href="#deb-src-http-security-ubuntu-com-ubuntu-bionic-security-main-restricted-universe-multiverse" class="headerlink" title="# deb-src http://security.ubuntu.com/ubuntu/ bionic-security main restricted universe multiverse"></a># deb-src <a target="_blank" rel="noopener" href="http://security.ubuntu.com/ubuntu/">http://security.ubuntu.com/ubuntu/</a> bionic-security main restricted universe multiverse</h1><h1 id="预发布软件源，不建议启用"><a href="#预发布软件源，不建议启用" class="headerlink" title="预发布软件源，不建议启用"></a>预发布软件源，不建议启用</h1><h1 id="deb-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-proposed-main-restricted-universe-multiverse"><a href="#deb-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-proposed-main-restricted-universe-multiverse" class="headerlink" title="deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse"></a>deb <a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu/">https://mirrors.tuna.tsinghua.edu.cn/ubuntu/</a> bionic-proposed main restricted universe multiverse</h1><h1 id="deb-src-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-proposed-main-restricted-universe-multiverse"><a href="#deb-src-https-mirrors-tuna-tsinghua-edu-cn-ubuntu-bionic-proposed-main-restricted-universe-multiverse" class="headerlink" title="# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse"></a># deb-src <a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu/">https://mirrors.tuna.tsinghua.edu.cn/ubuntu/</a> bionic-proposed main restricted universe multiverse</h1><p>apt update<br>apt install  python2.7 python-pip redis-tools dnsutils iputils-ping net-tools<br>pip install –upgrade pip<br>pip install redis-trib==0.5.1<br>#初始化redis集群 一主两从 对应三个PV<br>#创建master节点</p>
+<p>ping redis-0.redis.magedu.svc.cluster.local     ip对应redis0<br>redis-0 pod名    magedu.svc  magedu svc    cluster </p>
+<p>创建集群<br>redis-trib.py create <br><code>dig +short  redis-0.redis.magedu.svc.cluster.local</code>:6379 <br><code>dig +short  redis-1.redis.magedu.svc.cluster.local</code>:6379 <br><code>dig +short  redis-2.redis.magedu.svc.cluster.local</code>:6379</p>
+<p>添加slave</p>
+<p>redis-trib.py replicate <br>  –master-addr <code>dig +short redis-0.redis.magedu.svc.cluster.local</code>:6379 <br>  –slave-addr <code>dig +short redis-3.redis.magedu.svc.cluster.local</code>:6379</p>
+<p>redis-trib.py replicate <br>  –master-addr <code>dig +short redis-1.redis.magedu.svc.cluster.local</code>:6379 <br>  –slave-addr <code>dig +short redis-4.redis.magedu.svc.cluster.local</code>:6379</p>
+<p>redis-trib.py replicate <br>  –master-addr <code>dig +short redis-2.redis.magedu.svc.cluster.local</code>:6379 <br>  –slave-addr <code>dig +short redis-5.redis.magedu.svc.cluster.local</code>:6379</p>
+<p>进入一个redis pod<br>127.0.0.1:6379&gt; CLUSTER INFO<br>cluster_state:ok<br>cluster_slots_assigned:16384   #槽位<br>cluster_slots_ok:16384        ok的<br>cluster_slots_pfail:0<br>cluster_slots_fail:0<br>cluster_known_nodes:6      已知的节点<br>cluster_size:3            集群大小，3个master<br>cluster_current_epoch:3<br>cluster_my_epoch:2<br>cluster_stats_messages_ping_sent:1193<br>cluster_stats_messages_pong_sent:1186<br>cluster_stats_messages_meet_sent:3<br>cluster_stats_messages_sent:2382<br>cluster_stats_messages_ping_received:1184<br>cluster_stats_messages_pong_received:1196<br>cluster_stats_messages_meet_received:2<br>cluster_stats_messages_received:2382</p>
+<p>27.0.0.1:6379&gt; CLUSTER NODES<br>2e322dc6ce51582e54f34beb583e00d6c5aeca28 172.20.68.8:6379@16379 master - 0 1681920657809 1 connected 10923-16383（槽位范围）<br>764beabbd122991f6a053a97e422c35c8d22e16f 172.20.68.9:6379@16379 slave 2e322dc6ce51582e54f34beb583e00d6c5aeca28 0 1681920657000 1 connected<br>efbb7142eff6d42d6d3b372522af386f18701e1f 172.20.251.11:6379@16379 slave b332f644e343f3cdd89389a6abcba1d8e77f2a7d 0 1681920656000 3 connected<br>1d2ff545a39d4f1937709e1de56c69926a834435 172.20.115.15:6379@16379 myself（当前节点）,master - 0 1681920656000 2 connected 0-5461<br>65fcfcb72a26540dfe838da26efc1be62cde4ccc 172.20.115.16:6379@16379 slave 1d2ff545a39d4f1937709e1de56c69926a834435（masterid） 0 1681920655595 2 connected<br>b332f644e343f3cdd89389a6abcba1d8e77f2a7d 172.20.251.10:6379@16379 master - 0 1681920657000 3 connected 5462-10922</p>
+<p>测试写入数据<br>27.0.0.1:6379&gt; set test lup<br>(error) MOVED 6918 172.20.251.10:6379<br>127.0.0.1:6379&gt; set testkey1 testvl1<br>OK</p>
+<p>redis集群读写都在主库<br>get ddd<br>“gf”</p>
+<p>127.0.0.1:6379&gt; get ddd<br>(error) MOVED 11367 172.20.68.8:6379</p>
+<p>redis 集群 是没有db</p>
+<p>redis-trib.py create <br>  <code>dig +short redis-0.redis.redis-cluster.svc.cluster.local</code>:6379<br>#设置副本把slave节点加入集群中<br>redis-trib.py replicate <br>  –master-addr <code>dig +short redis-0.redis.redis-cluster.svc.cluster.local</code>:6379 <br>  –slave-addr <code>dig +short redis-1.redis.redis-cluster.svc.cluster.local</code>:6379<br>#设置副本把slave节点加入集群中<br>redis-trib.py replicate <br>  –master-addr <code>dig +short redis-0.redis.redis-cluster.svc.cluster.local</code>:6379 <br>  –slave-addr <code>dig +short redis-1.redis.redis-cluster.svc.cluster.local</code>:6379</p>
+<p>#要是初始化三主三从（一个master对应一个slave）需要对应6个PV<br>#创建三个主<br> redis-trib.py create <br>  <code>dig +short redis-0.redis.redis-cluster.cluster.local</code>:6379 <br>  <code>dig +short redis-1.redis.redis-cluster.cluster.local</code>:6379 <br>  <code>dig +short redis-2.redis.redis-cluster.svc.cluster.local</code>:6379</p>
+<p>#一个从加入一个主<br>redis-trib.py replicate <br>  –master-addr <code>dig +short redis-0.redis.redis-cluster.svc.cluster.local</code>:6379 <br>  –slave-addr <code>dig +short redis-3.redis.redis-cluster.svc.cluster.local</code>:6379<br>#一个从加入一个主<br>redis-trib.py replicate <br>  –master-addr <code>dig +short redis-1.redis.redis-cluster.svc.cluster.local</code>:6379 <br>  –slave-addr <code>dig +short redis-4.redis.redis-cluster.svc.cluster.local</code>:6379<br>#一个从加入一个主<br>redis-trib.py replicate <br>  –master-addr <code>dig +short redis-2.redis.redis-cluster.svc.cluster.local</code>:6379 <br>  –slave-addr <code>dig +short redis-5.redis.redis-cluster.svc.cluster.local</code>:6379</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/nginx/">nginx</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/hello/">hello</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/07/04/hello-world/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/07/02/%E7%AC%AC6%E4%B8%AA%E6%96%87%E7%AB%A0/">
+                        <span class="hidden-mobile">第6个文章2</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
